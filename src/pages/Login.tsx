@@ -6,17 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-
-interface LoginCredentials {
-  email: string;
-  password: string;
-}
+import {LoginRequest} from "@/types";
+import { login } from "@/services/authService";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: '',
+  const [credentials, setCredentials] = useState<LoginRequest>({
+    login: '',
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -26,30 +23,26 @@ const Login = () => {
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulating login
-    setTimeout(() => {
-      // For demo purposes, any email with a password longer than 5 chars works
-      if (credentials.email && credentials.password.length > 5) {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('user', JSON.stringify({ email: credentials.email }));
-        toast({
-          title: "Login bem-sucedido",
-          description: "Você foi autenticado com sucesso!",
-        });
-        navigate('/');
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Falha no login",
-          description: "Email ou senha inválidos. A senha deve ter pelo menos 6 caracteres.",
-        });
-      }
+    try {
+      console.log(credentials);
+      const response = await login(credentials);
+      localStorage.setItem('token', response.accessToken);
+      localStorage.setItem('username', response.username);
+      localStorage.setItem('isAuthenticated', String(response.authenticated));
+      navigate('/', { replace: true });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Falha no login",
+        description: "Email ou senha inválidos. A senha deve ter pelo menos 6 caracteres.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -64,13 +57,13 @@ const Login = () => {
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="login">Email</Label>
               <Input 
-                id="email"
-                name="email"
-                type="email" 
+                id="login"
+                name="login"
+                type="login"
                 placeholder="seu@email.com"
-                value={credentials.email}
+                value={credentials.login}
                 onChange={handleChange}
                 required
               />

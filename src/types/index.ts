@@ -72,3 +72,17 @@ export interface ChartData {
     borderWidth?: number;
   }[];
 }
+
+export interface LoginRequest {
+    login: string;
+    password: string;
+}
+
+export interface LoginResponse {
+  username: string;
+  authenticated: boolean;
+  created: Date;
+  expiration: Date;
+  accessToken: string;
+  refreshToken: string;
+}
