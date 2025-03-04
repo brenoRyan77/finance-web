@@ -1,0 +1,74 @@
+
+export type CardType = 'nubank' | 'itau' | 'banco-brasil' | 'inter' | 'cash';
+
+export type PaymentMethod = 'cash' | 'one-time' | 'installment';
+
+export interface Expense {
+  id: string;
+  description: string;
+  amount: number;
+  date: Date;
+  category: string;
+  cardType: CardType;
+  paymentMethod: PaymentMethod;
+  installments?: number;
+  currentInstallment?: number;
+  tags?: string[];
+  notes?: string;
+}
+
+export interface Income {
+  id: string;
+  description: string;
+  amount: number;
+  date: Date;
+  recurring: boolean;
+  notes?: string;
+}
+
+export interface MonthlyBudget {
+  month: number;
+  year: number;
+  income: number;
+  expenses: Expense[];
+  savings?: number;
+  investment?: number;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
+
+export interface CardInfo {
+  type: CardType;
+  name: string;
+  color: string;
+  icon: string;
+  closingDay?: number;
+  dueDay?: number;
+}
+
+export interface FinancialAdvice {
+  id: string;
+  title: string;
+  description: string;
+  savingsAmount?: number;
+  investmentSuggestion?: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
+export type Period = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+export interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    backgroundColor?: string;
+    borderColor?: string;
+    borderWidth?: number;
+  }[];
+}

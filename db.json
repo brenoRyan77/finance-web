@@ -1,0 +1,264 @@
+{
+  "categories": [
+    {
+      "id": "1",
+      "name": "Alimentação",
+      "icon": "utensils",
+      "color": "#FF6B6B"
+    },
+    {
+      "id": "2",
+      "name": "Transporte",
+      "icon": "car",
+      "color": "#4ECDC4"
+    },
+    {
+      "id": "3",
+      "name": "Moradia",
+      "icon": "home",
+      "color": "#45B7D1"
+    },
+    {
+      "id": "4",
+      "name": "Lazer",
+      "icon": "film",
+      "color": "#F9C74F"
+    },
+    {
+      "id": "5",
+      "name": "Saúde",
+      "icon": "heart-pulse",
+      "color": "#FF9F1C"
+    },
+    {
+      "id": "6",
+      "name": "Educação",
+      "icon": "book",
+      "color": "#A06CD5"
+    },
+    {
+      "id": "7",
+      "name": "Compras",
+      "icon": "shopping-bag",
+      "color": "#FF8FA3"
+    },
+    {
+      "id": "8",
+      "name": "Assinaturas",
+      "icon": "credit-card",
+      "color": "#4EA8DE"
+    },
+    {
+      "id": "9",
+      "name": "Outros",
+      "icon": "more-horizontal",
+      "color": "#99A1A6"
+    }
+  ],
+  "cards": [
+    {
+      "type": "nubank",
+      "name": "Nubank",
+      "color": "#8a05be",
+      "icon": "credit-card",
+      "closingDay": 3,
+      "dueDay": 10,
+      "id": "d7f5"
+    },
+    {
+      "type": "itau",
+      "name": "Itaú",
+      "color": "#ec7000",
+      "icon": "credit-card",
+      "closingDay": 5,
+      "dueDay": 12,
+      "id": "fd8e"
+    },
+    {
+      "type": "banco-brasil",
+      "name": "Banco do Brasil",
+      "color": "#ffef38",
+      "icon": "credit-card",
+      "closingDay": 10,
+      "dueDay": 15,
+      "id": "b534"
+    },
+    {
+      "type": "inter",
+      "name": "Inter",
+      "color": "#ff7a00",
+      "icon": "credit-card",
+      "closingDay": 15,
+      "dueDay": 22,
+      "id": "4ebf"
+    },
+    {
+      "type": "cash",
+      "name": "Dinheiro",
+      "color": "#4cd964",
+      "icon": "wallet",
+      "id": "0b6e"
+    }
+  ],
+  "incomes": [
+    {
+      "id": "1",
+      "description": "Salário",
+      "amount": 4750,
+      "date": "2023-05-05T00:00:00.000Z",
+      "recurring": true
+    }
+  ],
+  "expenses": [
+    {
+      "id": "1",
+      "description": "Supermercado",
+      "amount": 350.75,
+      "date": "2023-04-30T00:00:00.000Z",
+      "category": "1",
+      "cardType": "nubank",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "2",
+      "description": "Netflix",
+      "amount": 39.9,
+      "date": "2023-04-23T00:00:00.000Z",
+      "category": "8",
+      "cardType": "itau",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "3",
+      "description": "Combustível",
+      "amount": 120,
+      "date": "2023-05-02T00:00:00.000Z",
+      "category": "2",
+      "cardType": "banco-brasil",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "4",
+      "description": "Celular - Parcela 3/12",
+      "amount": 208.33,
+      "date": "2023-04-20T00:00:00.000Z",
+      "category": "7",
+      "cardType": "inter",
+      "paymentMethod": "installment",
+      "installments": 12,
+      "currentInstallment": 3
+    },
+    {
+      "id": "5",
+      "description": "Almoço",
+      "amount": 25.9,
+      "date": "2023-05-04T00:00:00.000Z",
+      "category": "1",
+      "cardType": "cash",
+      "paymentMethod": "cash"
+    },
+    {
+      "id": "6",
+      "description": "Internet",
+      "amount": 109.9,
+      "date": "2023-04-25T00:00:00.000Z",
+      "category": "8",
+      "cardType": "nubank",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "7",
+      "description": "Curso de Inglês",
+      "amount": 299,
+      "date": "2023-04-27T00:00:00.000Z",
+      "category": "6",
+      "cardType": "itau",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "8",
+      "description": "Farmácia",
+      "amount": 87.42,
+      "date": "2023-05-01T00:00:00.000Z",
+      "category": "5",
+      "cardType": "banco-brasil",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "9",
+      "description": "Show",
+      "amount": 180,
+      "date": "2023-05-03T00:00:00.000Z",
+      "category": "4",
+      "cardType": "inter",
+      "paymentMethod": "one-time"
+    },
+    {
+      "id": "10",
+      "description": "Aluguel",
+      "amount": 1200,
+      "date": "2023-05-05T00:00:00.000Z",
+      "category": "3",
+      "cardType": "cash",
+      "paymentMethod": "cash"
+    },
+    {
+      "id": "fd425783-e361-42cd-ab1a-163ba3a1c62b",
+      "description": "Sacolão",
+      "amount": 70,
+      "date": "2025-03-03T17:14:18.284Z",
+      "category": "1",
+      "cardType": "nubank",
+      "paymentMethod": "one-time",
+      "notes": "Várias verduras e frutas"
+    },
+    {
+      "id": "cfb5cb0d-1eca-423a-8609-43c97b8dfa47",
+      "description": "Cinema",
+      "amount": 100,
+      "date": "2025-03-03T21:04:22.987Z",
+      "category": "4",
+      "cardType": "nubank",
+      "paymentMethod": "one-time",
+      "notes": ""
+    }
+  ],
+  "financialAdvice": [
+    {
+      "id": "1",
+      "title": "Poupança de Emergência",
+      "description": "Economize R$950 para completar 6 meses de gastos essenciais em sua poupança de emergência.",
+      "savingsAmount": 950,
+      "priority": "high"
+    },
+    {
+      "id": "2",
+      "title": "Investimento em Renda Fixa",
+      "description": "Considere investir R$500 mensais em um CDB com liquidez diária para começar a construir seu patrimônio.",
+      "investmentSuggestion": "CDB com liquidez diária",
+      "savingsAmount": 500,
+      "priority": "medium"
+    },
+    {
+      "id": "3",
+      "title": "Pague dívidas de alto juros",
+      "description": "Priorize o pagamento de dívidas com taxas de juros acima de 12% ao ano antes de fazer novos investimentos.",
+      "priority": "high"
+    },
+    {
+      "id": "4",
+      "title": "Diversifique Investimentos",
+      "description": "Com o excedente mensal, considere diversificar em fundos imobiliários (FIIs) para renda passiva.",
+      "investmentSuggestion": "Fundos Imobiliários (FIIs)",
+      "priority": "low"
+    }
+  ],
+  "summary": {
+    "totalExpenses": 2621.2,
+    "totalIncome": 4750,
+    "balance": 2128.8,
+    "savingsRate": 44.82,
+    "month": "Maio",
+    "year": 2023
+  }
+}
