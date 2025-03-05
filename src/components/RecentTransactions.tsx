@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Expense } from '@/types';
+import {Expense, ExpenseVO} from '@/types';
 import TransactionItem from './TransactionItem';
 import ExpenseForm from './ExpenseForm';
 import { useToast } from '@/hooks/use-toast';
@@ -10,7 +10,7 @@ import { Plus } from 'lucide-react';
 
 interface RecentTransactionsProps {
   expenses: Expense[];
-  onAddExpense: (expense: Expense) => void;
+  onAddExpense: (expense: ExpenseVO) => void;
 }
 
 const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps) => {
@@ -27,7 +27,7 @@ const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps)
   
   const displayedExpenses = sortedExpenses.slice(0, displayLimit);
   
-  const handleAddExpense = (expense: Expense) => {
+  const handleAddExpense = (expense: ExpenseVO) => {
     onAddExpense(expense);
     toast({
       title: "Despesa adicionada",

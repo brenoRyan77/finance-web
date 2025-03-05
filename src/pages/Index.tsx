@@ -10,7 +10,7 @@ import MonthlyTrendChart from '@/components/MonthlyTrendChart';
 import RecentTransactions from '@/components/RecentTransactions';
 import FinancialAdviceCard from '@/components/FinancialAdviceCard';
 import ExpenseForm from '@/components/ExpenseForm';
-import { Expense } from '@/types';
+import {Expense, ExpenseVO} from '@/types';
 import { formatCurrency, getCurrentMonthYear } from '@/utils/formatters';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -20,6 +20,7 @@ import {
   fetchSummary,
   addExpense as apiAddExpense
 } from '@/services/api';
+import { create } from "@/services/expenseService.ts";
 
 const Index = () => {
   const queryClient = useQueryClient();
@@ -49,6 +50,10 @@ const Index = () => {
     queryKey: ['summary'],
     queryFn: fetchSummary
   });
+
+  const apiAddExpense = async (newExpense: ExpenseVO) => {
+    return create(newExpense); // Chama a função create que envia os dados ao backend
+  };
   
   // Mutation para adicionar despesa
   const addExpenseMutation = useMutation({
@@ -60,7 +65,7 @@ const Index = () => {
     }
   });
   
-  const handleAddExpense = (expense: Omit<Expense, 'id'>) => {
+  const handleAddExpense = (expense: Omit<ExpenseVO, 'id'>) => {
     addExpenseMutation.mutate(expense, {
       onSuccess: (newExpense) => {
         toast({

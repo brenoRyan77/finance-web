@@ -15,6 +15,7 @@ export interface Expense {
   currentInstallment?: number;
   tags?: string[];
   notes?: string;
+  userCardId?: number;
 }
 
 export interface Income {
@@ -43,6 +44,7 @@ export interface Category {
 }
 
 export interface CardInfo {
+  userCardId?: number;
   type: CardType;
   name: string;
   color: string;
@@ -85,4 +87,17 @@ export interface LoginResponse {
   expiration: Date;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface ExpenseVO {
+  id?: string;
+  description: string;
+  amount: number;
+  date: Date;
+  categoryId: string;
+  paymentMethod: PaymentMethod;
+  installments?: number;
+  currentInstallment?: number;
+  observation?: string;
+  userCardId?: number;
 }
