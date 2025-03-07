@@ -1,28 +1,32 @@
 
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
-import { getExpenses } from '@/utils/localStorage';
-import { cards } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
-import { addMonths, subMonths, format, startOfMonth, endOfMonth } from 'date-fns';
-import { CardInfo, Expense } from '@/types';
+import { addMonths, subMonths, format } from 'date-fns';
+import {CardDetails} from '@/types';
 import { formatCurrency, formatMonthYear } from '@/utils/formatters';
-import { Calendar, CreditCard, DollarSign } from 'lucide-react';
+import {Calendar, CreditCard, DollarSign, Loader} from 'lucide-react';
+import {fetchCardWithExpenses} from "@/services/userCardService.ts";
 
 const Cards = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [cards, setCards] = useState<CardDetails[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadExpenses = async () => {
-      const storedExpenses = getExpenses();
-      setExpenses(storedExpenses);
-      setIsLoading(false);
+    const loadCards = async () => {
+        try {
+            const cardDetails = await fetchCardWithExpenses(selectedDate.getFullYear(), selectedDate.getMonth() + 1);
+            setCards(cardDetails);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error loading cards:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
-    
-    loadExpenses();
-  }, []);
+    loadCards();
+  }, [selectedDate]);
 
   const handlePreviousMonth = () => {
     setSelectedDate(prev => subMonths(prev, 1));
@@ -32,41 +36,34 @@ const Cards = () => {
     setSelectedDate(prev => addMonths(prev, 1));
   };
 
-  // Filter expenses for the selected month
-  const getCardExpenses = (cardType: string) => {
-    const monthStart = startOfMonth(selectedDate);
-    const monthEnd = endOfMonth(selectedDate);
-    
-    return expenses.filter(expense => {
-      const expenseDate = new Date(expense.date);
-      return (
-        expense.cardType === cardType &&
-        expenseDate >= monthStart &&
-        expenseDate <= monthEnd
-      );
-    });
+  const getCardTotal = (cardId: number) => {
+    const card = cards.find(card => card.id === cardId);
+    return card ? card.totalAmount : 0;
   };
 
-  // Calculate total expenses for a card in the selected month
-  const getCardTotal = (cardType: string) => {
-    const cardExpenses = getCardExpenses(cardType);
-    return cardExpenses.reduce((total, expense) => total + expense.amount, 0);
-  };
-
-  // Get the next due date based on the card's due day
-  const getNextDueDate = (card: CardInfo) => {
+  const getNextDueDate = (card: CardDetails) => {
     if (!card.dueDay) return null;
     
     let dueDate = new Date(selectedDate);
     dueDate.setDate(card.dueDay);
     
-    // If the due date for this month has passed, show next month's
     if (dueDate < new Date()) {
       dueDate = addMonths(dueDate, 1);
     }
     
     return dueDate;
   };
+
+  if (isLoading) {
+    return (
+        <div className="min-h-screen bg-background">
+          <Header />
+          <div className="flex justify-center items-center h-screen">
+            <Loader className="animate-spin h-10 w-10 text-primary" />
+          </div>
+        </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -109,15 +106,12 @@ const Cards = () => {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {cards.map(card => {
-            // Skip the cash "card"
-            if (card.type === 'cash') return null;
-            
-            const cardTotal = getCardTotal(card.type);
+            const cardTotal = getCardTotal(card.id);
             const dueDate = getNextDueDate(card);
             
             return (
               <div 
-                key={card.type} 
+                key={card.id}
                 className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-card"
               >
                 {/* Card Header */}
@@ -171,26 +165,6 @@ const Cards = () => {
               </div>
             );
           })}
-        </div>
-        
-        {/* Cash Management Card */}
-        <div className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-card mb-6">
-          <div 
-            className="p-4 text-white flex justify-between items-center"
-            style={{ backgroundColor: '#4cd964' /* Green color for cash */ }}
-          >
-            <h3 className="font-medium">Dinheiro</h3>
-            <Wallet className="h-5 w-5" />
-          </div>
-          
-          <div className="p-4">
-            <div className="mb-4">
-              <div className="text-muted-foreground text-sm mb-1">Gastos em dinheiro (mês atual)</div>
-              <div className="text-2xl font-semibold">
-                {formatCurrency(getCardTotal('cash'))}
-              </div>
-            </div>
-          </div>
         </div>
       </main>
     </div>

@@ -101,3 +101,16 @@ export interface ExpenseVO {
   observation?: string;
   userCardId?: number;
 }
+
+export interface CardDetails {
+  id: number;
+  userCardId: number;
+  type: CardType;
+  name: string;
+  color: string;
+  icon: string;
+  closingDay: number;
+  dueDay: number;
+  totalAmount: number;
+  expensesVOS: ExpenseVO[];
+}
