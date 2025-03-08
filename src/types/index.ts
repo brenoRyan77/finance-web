@@ -112,5 +112,5 @@ export interface CardDetails {
   closingDay: number;
   dueDay: number;
   totalAmount: number;
-  expensesVOS: ExpenseVO[];
+  expenseVOS: ExpenseVO[];
 }
