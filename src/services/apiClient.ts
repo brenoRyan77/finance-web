@@ -2,7 +2,7 @@ import { apiUrl } from "@/config.ts";
 
 class ApiClient {
     private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         const headers = new Headers(options.headers || {});
         headers.set('Content-Type', 'application/json');
@@ -18,8 +18,8 @@ class ApiClient {
 
         if (!response.ok) {
             if (response.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
                 window.location.href = '/login';
             }
 

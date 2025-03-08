@@ -14,7 +14,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if(!token) {
         setIsAuthenticated(false);
         return;
@@ -30,7 +30,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
             description: "Por favor, faça login novamente.",
           });
           setIsAuthenticated(false);
-          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
         } else {
             setIsAuthenticated(true);
         }

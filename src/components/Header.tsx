@@ -44,8 +44,9 @@ const Header = () => {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('token');
     toast({
       title: "Logout realizado",
       description: "Você saiu da sua conta."
