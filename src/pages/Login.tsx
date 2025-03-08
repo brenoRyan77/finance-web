@@ -28,11 +28,10 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      console.log(credentials);
       const response = await login(credentials);
-      localStorage.setItem('token', response.accessToken);
-      localStorage.setItem('username', response.username);
-      localStorage.setItem('isAuthenticated', String(response.authenticated));
+      sessionStorage.setItem('token', response.accessToken);
+      sessionStorage.setItem('username', response.username);
+      sessionStorage.setItem('isAuthenticated', String(response.authenticated));
       navigate('/', { replace: true });
     } catch (error) {
       toast({

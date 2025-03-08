@@ -12,6 +12,7 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import CardSelection from "@/pages/CardSelection.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/cards" element={<AuthGuard><Cards /></AuthGuard>} />
           <Route path="/reports" element={<AuthGuard><Reports /></AuthGuard>} />
           <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
+          <Route path="/initial-setup" element={<AuthGuard><CardSelection /></AuthGuard>} />
           
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

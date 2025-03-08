@@ -1,4 +1,4 @@
-export type CardType = 'nubank' | 'itau' | 'banco-brasil' | 'inter' | 'cash';
+export type CardType = 'nubank' | 'itau' | 'banco-brasil' | 'inter' | 'cash' | 'bradesco' | 'caiax' | 'neon' | 'picpay' | 'santander';
 
 export type PaymentMethod = 'cash' | 'one-time' | 'installment';
 
@@ -43,6 +43,7 @@ export interface Category {
 }
 
 export interface CardInfo {
+    id?: number;
     userCardId?: number;
     type: CardType;
     name: string;
