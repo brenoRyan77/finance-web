@@ -5,10 +5,9 @@ import Header from '@/components/Header';
 import RecentTransactions from '@/components/RecentTransactions';
 import { Button } from '@/components/ui/button';
 import ExpenseForm from '@/components/ExpenseForm';
-import { Expense } from '@/types';
-import { getExpenses, saveExpenses } from '@/utils/localStorage';
-import { formatCurrency, getCurrentMonthYear, formatMonthYear } from '@/utils/formatters';
-import { PlusCircle, Filter } from 'lucide-react';
+import {ExpenseVO} from '@/types';
+import { formatCurrency, formatMonthYear } from '@/utils/formatters';
+import { PlusCircle } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -17,46 +16,49 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { addMonths, subMonths, format } from 'date-fns';
+import {create, getAll} from "@/services/expenseService.ts";
 
 const Transactions = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseVO[]>([]);
+  const [filteredExpenses, setFilteredExpenses] = useState<ExpenseVO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [availableMonths, setAvailableMonths] = useState<Date[]>([]);
   const { toast } = useToast();
 
-  // Load expenses from localStorage
   useEffect(() => {
-    const storedExpenses = getExpenses();
-    setExpenses(storedExpenses);
-    setIsLoading(false);
-    
-    // Extract unique months from expenses
-    extractAvailableMonths(storedExpenses);
-  }, []);
+    const loadExpenses = async () => {
+      setIsLoading(true);
+      try{
+        const response = await getAll(selectedDate.getFullYear(), selectedDate.getMonth() + 1);
+        setExpenses(response)
+      } catch (error){
+        console.error(error)
+      }finally {
+        setIsLoading(false)
+      }
+    };
+    loadExpenses();
+    extractAvailableMonths(expenses);
+  }, [selectedDate]);
 
-  // Filter expenses by selected month
   useEffect(() => {
     if (!isLoading) {
       filterExpensesByMonth(selectedDate);
     }
-  }, [expenses, selectedDate, isLoading]);
+  }, [expenses, selectedDate]);
 
-  const extractAvailableMonths = (expenses: Expense[]) => {
+  const extractAvailableMonths = (expenses: ExpenseVO[]) => {
     const months = new Set<string>();
     
-    // Add current month
     months.add(format(new Date(), 'yyyy-MM'));
     
-    // Add months from expenses
     expenses.forEach(expense => {
       const date = new Date(expense.date);
       const monthYear = format(date, 'yyyy-MM');
       months.add(monthYear);
     });
     
-    // Convert to Date objects and sort
     const sortedMonths = Array.from(months)
       .map(monthStr => {
         const [year, month] = monthStr.split('-').map(Number);
@@ -78,19 +80,30 @@ const Transactions = () => {
     setFilteredExpenses(filtered);
   };
 
-  const handleAddExpense = (expense: Expense) => {
-    const updatedExpenses = [...expenses, expense];
-    setExpenses(updatedExpenses);
-    saveExpenses(updatedExpenses);
-    
-    toast({
-      title: "Despesa adicionada",
-      description: `${expense.description} - ${formatCurrency(expense.amount)}`,
-    });
-    
-    // Update available months
-    extractAvailableMonths(updatedExpenses);
+  const handleAddExpense = async (expense: ExpenseVO) => {
+    try {
+      await create(expense);
+
+      const updatedExpenses = await getAll(selectedDate.getFullYear(), selectedDate.getMonth() + 1);
+      setExpenses(updatedExpenses);
+
+      extractAvailableMonths(updatedExpenses);
+
+      toast({
+        title: "Despesa adicionada",
+        description: `${expense.description} - ${formatCurrency(expense.amount)}`,
+      });
+
+    } catch (error) {
+      console.error("Erro ao adicionar despesa:", error);
+      toast({
+        title: "Erro ao adicionar despesa",
+        description: "Não foi possível salvar a despesa. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
+
 
   const handleMonthChange = (monthYearStr: string) => {
     const [year, month] = monthYearStr.split('-').map(Number);

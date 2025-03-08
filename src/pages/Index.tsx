@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
@@ -10,29 +9,34 @@ import MonthlyTrendChart from '@/components/MonthlyTrendChart';
 import RecentTransactions from '@/components/RecentTransactions';
 import FinancialAdviceCard from '@/components/FinancialAdviceCard';
 import ExpenseForm from '@/components/ExpenseForm';
-import {Expense, ExpenseVO} from '@/types';
+import {ExpenseVO} from '@/types';
 import { formatCurrency, getCurrentMonthYear } from '@/utils/formatters';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { 
-  fetchExpenses, 
-  fetchFinancialAdvice, 
+  fetchFinancialAdvice,
   fetchSummary,
-  addExpense as apiAddExpense
 } from '@/services/api';
-import { create } from "@/services/expenseService.ts";
+import {create, getAll} from "@/services/expenseService.ts";
 
 const Index = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
-  // Obter dados usando react-query
-  const { 
+
+  const getCurrentYearMonth = () => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() + 1 };
+  };
+
+  const {
     data: expenses = [],
     isLoading: isLoadingExpenses
   } = useQuery({
     queryKey: ['expenses'],
-    queryFn: fetchExpenses
+    queryFn: async () => {
+      const { year, month } = getCurrentYearMonth();
+      return getAll(year, month);
+    }
   });
   
   const { 
@@ -52,14 +56,12 @@ const Index = () => {
   });
 
   const apiAddExpense = async (newExpense: ExpenseVO) => {
-    return create(newExpense); // Chama a função create que envia os dados ao backend
+    return create(newExpense);
   };
   
-  // Mutation para adicionar despesa
   const addExpenseMutation = useMutation({
     mutationFn: apiAddExpense,
     onSuccess: () => {
-      // Invalidar queries para recarregar os dados
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['summary'] });
     }
@@ -160,7 +162,6 @@ const Index = () => {
             <RecentTransactions 
               expenses={expenses} 
               onAddExpense={handleAddExpense} 
-              isLoading={isLoadingExpenses}
             />
           </div>
           <div>

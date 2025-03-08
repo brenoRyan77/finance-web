@@ -199,50 +199,6 @@ export const financialAdvice: FinancialAdvice[] = [
   },
 ];
 
-// Generate chart data
-export const generateCategoryData = () => {
-  const categoryTotals: { [key: string]: number } = {};
-  
-  expenses.forEach(expense => {
-    if (!categoryTotals[expense.category]) {
-      categoryTotals[expense.category] = 0;
-    }
-    categoryTotals[expense.category] += expense.amount;
-  });
-  
-  return {
-    labels: categories.map(cat => cat.name),
-    datasets: [
-      {
-        label: 'Gastos por Categoria',
-        data: categories.map(cat => categoryTotals[cat.id] || 0),
-        backgroundColor: categories.map(cat => cat.color),
-      },
-    ],
-  };
-};
-
-export const generateCardData = () => {
-  const cardTotals: { [key: string]: number } = {};
-  
-  expenses.forEach(expense => {
-    if (!cardTotals[expense.cardType]) {
-      cardTotals[expense.cardType] = 0;
-    }
-    cardTotals[expense.cardType] += expense.amount;
-  });
-  
-  return {
-    labels: cards.map(card => card.name),
-    datasets: [
-      {
-        label: 'Gastos por Cartão',
-        data: cards.map(card => cardTotals[card.type] || 0),
-        backgroundColor: cards.map(card => card.color),
-      },
-    ],
-  };
-};
 
 export const generateMonthlyData = () => {
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];

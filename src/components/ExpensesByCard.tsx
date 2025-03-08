@@ -2,12 +2,12 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Expense } from '@/types';
+import {ExpenseVO} from '@/types';
 import { formatCurrency } from '@/utils/formatters';
-import { fetchCards } from '@/services/api';
+import { fetchCards } from '@/services/cardService.ts';
 
 interface ExpensesByCardProps {
-  expenses: Expense[];
+  expenses: ExpenseVO[];
 }
 
 const ExpensesByCard = ({ expenses }: ExpensesByCardProps) => {
@@ -23,10 +23,10 @@ const ExpensesByCard = ({ expenses }: ExpensesByCardProps) => {
     const cardTotals: { [key: string]: number } = {};
     
     expenses.forEach(expense => {
-      if (!cardTotals[expense.cardType]) {
-        cardTotals[expense.cardType] = 0;
+      if (!cardTotals[expense.card.type]) {
+        cardTotals[expense.card.type] = 0;
       }
-      cardTotals[expense.cardType] += expense.amount;
+      cardTotals[expense.card.type] += expense.amount;
     });
     
     return cards.map(card => ({

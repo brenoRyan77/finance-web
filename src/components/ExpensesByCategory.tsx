@@ -2,12 +2,12 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Expense } from '@/types';
+import {Expense, ExpenseVO} from '@/types';
 import { formatCurrency } from '@/utils/formatters';
 import { fetchCategories } from '@/services/api';
 
 interface ExpensesByCategoryProps {
-  expenses: Expense[];
+  expenses: ExpenseVO[];
 }
 
 const ExpensesByCategory = ({ expenses }: ExpensesByCategoryProps) => {
@@ -23,10 +23,10 @@ const ExpensesByCategory = ({ expenses }: ExpensesByCategoryProps) => {
     const categoryTotals: { [key: string]: number } = {};
     
     expenses.forEach(expense => {
-      if (!categoryTotals[expense.category]) {
-        categoryTotals[expense.category] = 0;
+      if (!categoryTotals[expense.category.id]) {
+        categoryTotals[expense.category.id] = 0;
       }
-      categoryTotals[expense.category] += expense.amount;
+      categoryTotals[expense.category.id] += expense.amount;
     });
     
     return categories.map(cat => ({

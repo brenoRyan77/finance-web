@@ -69,8 +69,10 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
         e.preventDefault();
 
         if (!description || !amount || !category) {
-            return; // Validation failed
+            return;
         }
+
+        const userCardIdNovo = userCards.find(card => card.type === cardType)?.userCardId;
 
         const newExpense: ExpenseVO = {
             description,
@@ -79,15 +81,13 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
             categoryId: category,
             paymentMethod: paymentMethod,
             observation: notes || "",
-            userCardId: userCardId
+            userCardId: userCardIdNovo
         };
 
         if (paymentMethod === 'installment') {
             newExpense.installments = installments;
             newExpense.currentInstallment = 1;
         }
-
-        console.log(newExpense);
 
         onSubmit(newExpense);
         setOpen(false);

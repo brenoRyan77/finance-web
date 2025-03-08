@@ -9,7 +9,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { Plus } from 'lucide-react';
 
 interface RecentTransactionsProps {
-  expenses: Expense[];
+  expenses: ExpenseVO[];
   onAddExpense: (expense: ExpenseVO) => void;
 }
 
@@ -17,11 +17,9 @@ const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps)
   const [expanded, setExpanded] = useState(false);
   const { toast } = useToast();
   
-  // Show at most 5 transactions by default
   const displayLimit = expanded ? expenses.length : 5;
   
-  // Sort expenses by date, most recent first
-  const sortedExpenses = [...expenses].sort((a, b) => 
+  const sortedExpenses = [...expenses].sort((a, b) =>
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   

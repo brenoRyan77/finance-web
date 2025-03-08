@@ -1,24 +1,49 @@
 
-import { Expense } from '@/types';
-import { formatCurrency, formatDate } from '@/utils/formatters';
-import { categories } from '@/data/mockData';
-import { cards } from '@/data/mockData';
+import {CardInfo, CategoryVO, ExpenseVO} from '@/types';
+import { formatCurrency } from '@/utils/formatters';
 import { CreditCard, Banknote, CalendarClock, BadgeDollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {useEffect, useState} from "react";
+import {fetchCategories} from "@/services/categoryService.ts";
+import {fetchCards} from "@/services/cardService.ts";
+import {format} from "date-fns";
 
 interface TransactionItemProps {
-  transaction: Expense;
+  transaction: ExpenseVO;
   onClick?: () => void;
 }
 
 const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
-  // Find category for the transaction
-  const category = categories.find(cat => cat.id === transaction.category);
+  const [categories, setCategories] = useState<CategoryVO[]>([]);
+  const [cards, setCards] = useState<CardInfo[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetchCategories();
+        setCategories(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const loadCards = async () => {
+      try {
+        const response = await fetchCards();
+        setCards(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadCategories();
+    loadCards();
+
+  }, []);
+  const category = categories.find(cat => cat.id === transaction.category.id);
   
-  // Find card for the transaction
-  const card = cards.find(c => c.type === transaction.cardType);
+  const card = cards.find(c => c.type === transaction.card.type);
   
-  // Determine icon based on payment method
   const getPaymentIcon = () => {
     switch (transaction.paymentMethod) {
       case 'cash':
@@ -26,7 +51,7 @@ const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
       case 'installment':
         return <CalendarClock className="h-4 w-4" />;
       case 'one-time':
-        return transaction.cardType === 'cash' 
+        return transaction.card.type === 'cash'
           ? <Banknote className="h-4 w-4" /> 
           : <CreditCard className="h-4 w-4" />;
       default:
@@ -34,7 +59,6 @@ const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
     }
   };
 
-  // Format installment text if applicable
   const getInstallmentText = () => {
     if (transaction.paymentMethod === 'installment' && transaction.installments && transaction.currentInstallment) {
       return ` (${transaction.currentInstallment}/${transaction.installments})`;
@@ -50,7 +74,6 @@ const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
       )}
       onClick={onClick}
     >
-      {/* Left side: Category icon and transaction details */}
       <div className="flex items-center space-x-3">
         {/* Category circle */}
         <div 
@@ -67,7 +90,7 @@ const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
         <div>
           <p className="font-medium text-foreground">{transaction.description}</p>
           <div className="text-xs text-muted-foreground flex items-center mt-0.5">
-            <span>{formatDate(transaction.date)}</span>
+            <span>{format(transaction.date, 'dd/MM/yyyy')}</span>
             <span className="mx-1.5">•</span>
             <span className="flex items-center">
               {getPaymentIcon()}
