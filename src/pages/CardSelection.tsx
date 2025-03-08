@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { getSettings, saveSettings } from '@/utils/localStorage';
-import { CardInfo } from '@/types';
+import {CardInfo, UserVO} from '@/types';
 import {fetchCards} from "@/services/cardService.ts";
+import {updateUser} from "@/services/userService.ts";
 
 interface CardSelectionState {
     [key: string]: {
@@ -87,7 +88,7 @@ const CardSelection = () => {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         // Validate form
         let isValid = true;
         let errorMessage = '';
@@ -167,7 +168,24 @@ const CardSelection = () => {
             description: "Suas preferências foram salvas com sucesso!",
         });
 
-        // Redirect to dashboard
+        const data: UserVO = {
+            ...JSON.parse(sessionStorage.getItem('user') || '{}'),
+            userCards: configuredCards.map(card => ({
+                closingDay: card.closingDay,
+                dueDay: card.dueDay,
+                card: {
+                    id: card.id,
+                    type: card.type,
+                    name: card.name,
+                    color: card.color,
+                    icon: card.icon
+                }
+            }))
+        };
+
+        console.log('Settings saved:', data);
+
+        await updateUser(data);
         navigate('/');
     };
 

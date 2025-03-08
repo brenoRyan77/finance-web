@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import {LoginRequest} from "@/types";
 import { login } from "@/services/authService";
+import {getUserByLogin} from "@/services/userService.ts";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,10 +30,27 @@ const Login = () => {
     
     try {
       const response = await login(credentials);
+      if(!response.authenticated){
+        toast({
+            variant: "destructive",
+            title: "Falha no login",
+            description: "Email ou senha inválidos. A senha deve ter pelo menos 6 caracteres.",
+        })
+        return;
+      }
+
       sessionStorage.setItem('token', response.accessToken);
       sessionStorage.setItem('username', response.username);
       sessionStorage.setItem('isAuthenticated', String(response.authenticated));
-      navigate('/', { replace: true });
+
+      const responseUser = await getUserByLogin(response.username);
+      sessionStorage.setItem('user', JSON.stringify(responseUser));
+
+      if (!responseUser.userCards || responseUser.userCards.length === 0) {
+        navigate('/initial-setup', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (error) {
       toast({
         variant: "destructive",

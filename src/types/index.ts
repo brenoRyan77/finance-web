@@ -87,6 +87,7 @@ export interface LoginResponse {
     expiration: Date;
     accessToken: string;
     refreshToken: string;
+    hasCards: boolean;
 }
 
 export interface ExpenseVO {
@@ -130,4 +131,20 @@ export interface CardVO {
     name: string;
     color: string;
     icon: string;
+}
+
+export interface UserVO {
+    id: number;
+    name: string;
+    email: string;
+    login: string;
+    password?: string;
+    userCards?: UserCardVO[];
+}
+
+export interface UserCardVO {
+    id?: number;
+    closingDay: number;
+    dueDay: number;
+    card: Partial<CardInfo>;
 }
