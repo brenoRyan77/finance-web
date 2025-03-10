@@ -124,21 +124,21 @@ const Index = () => {
             />
             <SummaryCard 
               title="Despesas" 
-              amount={summary.totalExpenses}
+              amount={expenses.reduce((acc, expense) => acc + expense.amount, 0)}
               description={`${expenses.length} transações`}
               icon="expense"
               variant="expense"
             />
             <SummaryCard 
               title="Saldo" 
-              amount={summary.balance}
+              amount={summary.totalIncome - expenses.reduce((acc, expense) => acc + expense.amount, 0)}
               description="Disponível para economizar ou investir"
               icon="balance"
               variant="balance"
             />
             <SummaryCard 
-              title="Taxa de Poupança" 
-              amount={summary.savingsRate}
+              title="Taxa de Poupança"
+              amount={((summary.totalIncome - expenses.reduce((acc, expense) => acc + expense.amount, 0)) / summary.totalIncome) * 100}
               description="Percentual da receita economizado"
               icon="savings-rate"
               variant="savings-rate"
