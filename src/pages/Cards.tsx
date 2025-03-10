@@ -136,7 +136,9 @@ const Cards = () => {
                     {cards.map(card => {
                         const cardTotal = getCardTotal(card.id);
                         const dueDate = getNextDueDate(card);
-
+                        if(card.type === 'cash') {
+                            return null;
+                        }
                         return (
                             <div
                                 key={card.id}
@@ -193,6 +195,34 @@ const Cards = () => {
                             </div>
                         );
                     })}
+                </div>
+                {/* Cash Management Card */}
+                <div className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-card mb-6">
+                    <div
+                        className="p-4 text-white flex justify-between items-center"
+                        style={{ backgroundColor: '#4cd964' /* Green color for cash */ }}
+                    >
+                        <h3 className="font-medium">Dinheiro/Pix</h3>
+                        <Wallet className="h-5 w-5" />
+                    </div>
+
+                    <div className="p-4">
+                        <div className="mb-4">
+                            <div className="text-muted-foreground text-sm mb-1">Gastos em dinheiro ou Pix (mês atual)</div>
+                            <div className="text-2xl font-semibold">
+                                {formatCurrency(cards.find(c => c.type === 'cash')?.totalAmount || 0)}
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => handleCardDetails(cards.find(c => c.type === 'cash')!)}
+                            >
+                                Ver Detalhes
+                            </Button>
+                        </div>
+                    </div>
                 </div>
                 {selectedCard && (
                     <CardDetailsModal

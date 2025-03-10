@@ -21,19 +21,31 @@ const ExpensesByCard = ({ expenses }: ExpensesByCardProps) => {
     if (!cards.length) return [];
     
     const cardTotals: { [key: string]: number } = {};
-    
+
     expenses.forEach(expense => {
-      if (!cardTotals[expense.card.type]) {
-        cardTotals[expense.card.type] = 0;
+      if (expense.card) {
+        if (!cardTotals[expense.card.type]) {
+          cardTotals[expense.card.type] = 0;
+        }
+        cardTotals[expense.card.type] += expense.amount;
+      } else if (expense.paymentMethod === "cash") {
+        if (!cardTotals["cash"]) {
+          cardTotals["cash"] = 0;
+        }
+        cardTotals["cash"] += expense.amount;
       }
-      cardTotals[expense.card.type] += expense.amount;
     });
-    
-    return cards.map(card => ({
-      name: card.name,
-      value: cardTotals[card.type] || 0,
-      color: card.color
-    })).filter(card => card.value > 0);
+
+    return cards
+        .map(card => ({
+          name: card.name,
+          value: cardTotals[card.type] || 0,
+          color: card.color
+        }))
+        .filter(card => card.value > 0)
+        .concat(
+            cardTotals["cash"] ? [{ name: "Dinheiro/Pix", value: cardTotals["cash"], color: "#4cd964" }] : []
+        );
   }, [expenses, cards]);
 
   // Custom tooltip

@@ -89,6 +89,10 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
             newExpense.currentInstallment = 1;
         }
 
+        if(paymentMethod === 'cash') {
+            newExpense.userCardId = null;
+        }
+
         onSubmit(newExpense);
         setOpen(false);
         resetForm();

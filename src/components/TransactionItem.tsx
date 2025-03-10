@@ -41,8 +41,8 @@ const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
 
   }, []);
   const category = categories.find(cat => cat.id === transaction.category.id);
-  
-  const card = cards.find(c => c.type === transaction.card.type);
+
+  const card = transaction.card ? cards.find(c => c.type === transaction.card.type) : null;
   
   const getPaymentIcon = () => {
     switch (transaction.paymentMethod) {
@@ -51,7 +51,7 @@ const TransactionItem = ({ transaction, onClick }: TransactionItemProps) => {
       case 'installment':
         return <CalendarClock className="h-4 w-4" />;
       case 'one-time':
-        return transaction.card.type === 'cash'
+        return transaction.card && transaction.card.type === 'cash'
           ? <Banknote className="h-4 w-4" /> 
           : <CreditCard className="h-4 w-4" />;
       default:
