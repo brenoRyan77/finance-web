@@ -202,32 +202,25 @@ export const financialAdvice: FinancialAdvice[] = [
 
 export const generateMonthlyData = () => {
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-  const currentMonth = new Date().getMonth();
-  
-  // Mock data for the last 6 months
-  const expensesData = [2850, 3100, 2790, 3200, 2950, 2730];
-  const incomeData = Array(6).fill(4750); // Fixed income of 4750
-  
+  const currentMonth = new Date().getMonth(); // 0-based (Jan = 0)
+
+  // Mock de dados para os últimos 6 meses
+  const expensesData = [2850, 3100, 4500, 3200, 2950, 4500];
+  const incomeData = Array(6).fill(4750); // Receita fixa de 4750
+
+  // Corrigir caso currentMonth seja menor que 5 para evitar índices negativos
+  const startIndex = Math.max(0, currentMonth - 5);
+  const labels = months.slice(startIndex, currentMonth + 1);
+
   return {
-    labels: months.slice(currentMonth - 5, currentMonth + 1),
+    labels,
     datasets: [
-      {
-        label: 'Receitas',
-        data: incomeData,
-        backgroundColor: 'rgba(76, 217, 100, 0.2)',
-        borderColor: 'rgba(76, 217, 100, 1)',
-        borderWidth: 2,
-      },
-      {
-        label: 'Despesas',
-        data: expensesData,
-        backgroundColor: 'rgba(255, 59, 48, 0.2)',
-        borderColor: 'rgba(255, 59, 48, 1)',
-        borderWidth: 2,
-      },
+      { label: 'Receitas', data: incomeData },
+      { label: 'Despesas', data: expensesData },
     ],
   };
 };
+
 
 export const getMonthlySummary = () => {
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);

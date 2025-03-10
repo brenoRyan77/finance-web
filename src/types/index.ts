@@ -148,3 +148,9 @@ export interface UserCardVO {
     dueDay: number;
     card: Partial<CardInfo>;
 }
+
+export interface MonthlyData {
+    income: number;
+    totalExpenses: number;
+    expenses: ExpenseVO[];
+}

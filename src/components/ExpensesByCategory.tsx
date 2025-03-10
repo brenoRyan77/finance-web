@@ -11,7 +11,6 @@ interface ExpensesByCategoryProps {
 }
 
 const ExpensesByCategory = ({ expenses }: ExpensesByCategoryProps) => {
-  // Buscar categorias da API
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories

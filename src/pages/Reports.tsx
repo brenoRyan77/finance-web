@@ -5,25 +5,38 @@ import ExpensesByCategory from '@/components/ExpensesByCategory';
 import ExpensesByCard from '@/components/ExpensesByCard';
 import MonthlyTrendChart from '@/components/MonthlyTrendChart';
 import { Button } from '@/components/ui/button';
-import { getExpenses } from '@/utils/localStorage';
-import { Expense } from '@/types';
-import { addMonths, subMonths, startOfMonth, endOfMonth, format } from 'date-fns';
+import { ExpenseVO} from '@/types';
+import { addMonths, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { formatMonthYear, formatCurrency } from '@/utils/formatters';
+import {getAll, getMonthlySummary} from "@/services/expenseService.ts";
+import { useToast} from "@/hooks/use-toast.ts";
 
 const Reports = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseVO[]>([]);
+  const [filteredExpenses, setFilteredExpenses] = useState<ExpenseVO[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(true);
+    const { toast } = useToast();
 
-  // Load expenses from localStorage
   useEffect(() => {
-    const storedExpenses = getExpenses();
-    setExpenses(storedExpenses);
-    setIsLoading(false);
-  }, []);
+    const loadExpenses = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getAll(selectedDate.getFullYear(), selectedDate.getMonth() + 1);
+        setExpenses(response);
+      }catch (error) {
+        console.error('Error retrieving expenses from localStorage:', error);
+        toast({
+          title: 'Erro',
+          description: 'Erro ao carregar despesas',
+        })
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadExpenses();
+  }, [selectedDate]);
 
-  // Filter expenses for selected month
   useEffect(() => {
     if (!isLoading) {
       const monthStart = startOfMonth(selectedDate);
@@ -46,10 +59,8 @@ const Reports = () => {
     setSelectedDate(prev => addMonths(prev, 1));
   };
 
-  // Calculate monthly summary
   const calculateMonthlySummary = () => {
     const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    // Fixed income of 4750 from mock data
     const totalIncome = 4750;
     const balance = totalIncome - totalExpenses;
     const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
