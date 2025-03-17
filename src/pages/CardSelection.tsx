@@ -89,11 +89,9 @@ const CardSelection = () => {
     };
 
     const handleSave = async () => {
-        // Validate form
         let isValid = true;
         let errorMessage = '';
 
-        // Check if at least one card is selected
         const hasSelectedCard = Object.values(cardSelections).some(card => card.selected);
 
         if (!hasSelectedCard) {
@@ -101,7 +99,6 @@ const CardSelection = () => {
             errorMessage = 'Selecione pelo menos um cartão.';
         }
 
-        // Check if selected cards have closing and due days
         Object.entries(cardSelections).forEach(([cardType, cardData]) => {
             if (cardData.selected) {
                 if (!cardData.closingDay) {
@@ -115,7 +112,6 @@ const CardSelection = () => {
             }
         });
 
-        // Check if monthly income is provided
         if (!monthlyIncome || parseFloat(monthlyIncome.replace(',', '.')) <= 0) {
             isValid = false;
             errorMessage = 'Informe uma renda mensal válida.';
@@ -130,17 +126,13 @@ const CardSelection = () => {
             return;
         }
 
-        // Get current settings
         const currentSettings = getSettings();
 
-        // Prepare configured cards
         const configuredCards: CardInfo[] = [];
 
-        // Always include cash as an option
         const cashCard = cards.find(card => card.type === 'cash');
         if (cashCard) configuredCards.push(cashCard);
 
-        // Add selected credit cards
         Object.entries(cardSelections).forEach(([cardType, cardData]) => {
             if (cardData.selected) {
                 const card = cards.find(c => c.type === cardType);
@@ -163,11 +155,6 @@ const CardSelection = () => {
             setupDate: new Date().toISOString()
         });
 
-        toast({
-            title: "Configuração concluída",
-            description: "Suas preferências foram salvas com sucesso!",
-        });
-
         const data: UserVO = {
             ...JSON.parse(sessionStorage.getItem('user') || '{}'),
             userCards: configuredCards.map(card => ({
@@ -182,11 +169,22 @@ const CardSelection = () => {
                 }
             }))
         };
+       try {
+           await updateUser(data);
+           toast({
+               title: "Configuração concluída",
+               description: "Suas preferências foram salvas com sucesso!",
+           });
+           navigate('/', { replace: true });
 
-        console.log('Settings saved:', data);
-
-        await updateUser(data);
-        navigate('/');
+       }catch (error){
+           console.error('Error saving user:', error);
+           toast({
+               title: "Erro",
+               description: "Ocorreu um erro ao salvar suas preferências. Tente novamente.",
+               variant: "destructive"
+           });
+       }
     };
 
     return (

@@ -52,10 +52,11 @@ const Login = () => {
         navigate('/', { replace: true });
       }
     } catch (error) {
+      const parsedError = JSON.parse(error.message);
       toast({
         variant: "destructive",
         title: "Falha no login",
-        description: "Email ou senha inválidos. A senha deve ter pelo menos 6 caracteres.",
+        description: parsedError.message,
       });
     } finally {
       setIsLoading(false);
@@ -113,13 +114,28 @@ const Login = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
+            <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
+
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">Ainda não tem uma conta?</span>{" "}
+              <a
+                  href="/pre-registration"
+                  className="text-primary hover:underline"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/pre-registration');
+                  }}
+              >
+                Solicite seu cadastro
+              </a>
+            </div>
+
             <p className="text-sm text-center text-muted-foreground mt-2">
               Ao continuar, você concorda com nossos{" "}
               <a href="#" className="text-primary hover:underline">Termos de Serviço</a>

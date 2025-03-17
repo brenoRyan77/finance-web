@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthGuard from "./components/AuthGuard";
 import Index from "./pages/Index";
 import Transactions from "./pages/Transactions";
@@ -13,6 +13,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import CardSelection from "@/pages/CardSelection.tsx";
+import PreRegistration from "@/pages/PreRegistration.tsx";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
         <Routes>
           {/* Public route */}
           <Route path="/login" element={<Login />} />
+          <Route path="/pre-registration" element={<PreRegistration />} />
 
           {/* Protected routes */}
           <Route path="/" element={<AuthGuard><Index /></AuthGuard>} />

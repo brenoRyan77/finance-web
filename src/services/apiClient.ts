@@ -23,11 +23,27 @@ class ApiClient {
                 window.location.href = '/login';
             }
 
-            const errorMessage = await response.text();
-            throw new Error(errorMessage || 'Erro na requisição');
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const errorResponse = await response.json();
+                throw new Error(JSON.stringify(errorResponse));
+            }
+
+            throw new Error('Erro na requisição');
         }
 
-        return response.json();
+        if (response.status === 204) {
+            return null as T; // ou {} as T se precisar evitar null
+        }
+
+        // Verifica se a resposta tem um corpo antes de tentar fazer response.json()
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        }
+
+
+        return {} as T;
     }
 
     get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
