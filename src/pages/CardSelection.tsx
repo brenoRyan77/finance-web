@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { getSettings, saveSettings } from '@/utils/localStorage';
-import {CardInfo, UserVO} from '@/types';
+import {CardInfo, InitialSetup, UserVO} from '@/types';
 import {fetchCards} from "@/services/cardService.ts";
-import {updateUser} from "@/services/userService.ts";
+import {initialSetup} from "@/services/userService.ts";
+import {getInitialSetup} from "@/services/incomeService.ts";
 
 interface CardSelectionState {
     [key: string]: {
@@ -23,33 +24,52 @@ const CardSelection = () => {
     const { toast } = useToast();
     const [monthlyIncome, setMonthlyIncome] = useState<string>('4750');
     const [cards, setCards] = useState<CardInfo[]>([]);
+    const [initialSetupInfo, setInitialSetupInfo] = useState<InitialSetup | null>(null);
+    const [cardSelections, setCardSelections] = useState<CardSelectionState>({});
 
     useEffect(() => {
         const loadCards = async () => {
-            try{
+            try {
                 const cardData = await fetchCards();
-                console.log('Card data:', cardData);
                 setCards(cardData);
-            }catch (error){
-                console.error('Error loading cards:', error);
+            } catch (error) {
+                console.error("Error loading cards:", error);
             }
         };
+
+        const loadCardByUser = async () => {
+            try {
+                const cardData = await getInitialSetup();
+                setInitialSetupInfo(cardData);
+            } catch (error) {
+                console.error("Error loading user cards:", error);
+            }
+        };
+
+        // Executa as funções assíncronas
         loadCards();
+        loadCardByUser();
     }, []);
 
-    const [cardSelections, setCardSelections] = useState<CardSelectionState>(() => {
-        const initialState: CardSelectionState = {};
-        cards.forEach(card => {
-            if (card.type !== 'cash') { // Cash is always included
-                initialState[card.type] = {
-                    selected: false,
-                    closingDay: card.closingDay?.toString() || '',
-                    dueDay: card.dueDay?.toString() || ''
-                };
-            }
-        });
-        return initialState;
-    });
+    useEffect(() => {
+        if (initialSetupInfo) {
+            setMonthlyIncome(initialSetupInfo.income?.amount?.toString() || '');
+
+            const updatedSelections: CardSelectionState = {};
+            cards.forEach(card => {
+                if (card.type !== 'cash') {
+                    const existingCard = initialSetupInfo.userCards.find(userCard => userCard.card.type === card.type);
+                    updatedSelections[card.type] = {
+                        selected: !!existingCard,
+                        closingDay: existingCard?.closingDay?.toString() || '',
+                        dueDay: existingCard?.dueDay?.toString() || ''
+                    };
+                }
+            });
+
+            setCardSelections(updatedSelections);
+        }
+    }, [initialSetupInfo, cards]);
 
     const handleCardSelection = (cardType: string, checked: boolean) => {
         setCardSelections(prev => ({
@@ -155,8 +175,9 @@ const CardSelection = () => {
             setupDate: new Date().toISOString()
         });
 
-        const data: UserVO = {
-            ...JSON.parse(sessionStorage.getItem('user') || '{}'),
+        const user: UserVO = JSON.parse(sessionStorage.getItem('user') || '{}')
+        const data: InitialSetup = {
+            userId: user.id,
             userCards: configuredCards.map(card => ({
                 closingDay: card.closingDay,
                 dueDay: card.dueDay,
@@ -167,10 +188,16 @@ const CardSelection = () => {
                     color: card.color,
                     icon: card.icon
                 }
-            }))
+            })),
+            income: {
+                amount: parseFloat(monthlyIncome.replace(',', '.')),
+                description: 'Renda mensal'
+            }
         };
        try {
-           await updateUser(data);
+
+           await initialSetup(data);
+
            toast({
                title: "Configuração concluída",
                description: "Suas preferências foram salvas com sucesso!",

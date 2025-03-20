@@ -41,7 +41,7 @@ const CardManager = () => {
 
     const handleAddCard = () => {
         // Redirect to card selection page
-        window.location.href = '/card-selection';
+        window.location.href = '/initial-setup';
     };
 
     const confirmCardDeletion = (card: CardInfo, e: React.MouseEvent) => {

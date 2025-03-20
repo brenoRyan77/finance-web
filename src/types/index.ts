@@ -154,3 +154,9 @@ export interface MonthlyData {
     totalExpenses: number;
     expenses: ExpenseVO[];
 }
+
+export interface InitialSetup {
+    userId: number;
+    userCards: UserCardVO[];
+    income: Partial<Income>;
+}

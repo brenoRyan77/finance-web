@@ -7,17 +7,13 @@ import ExpensesByCategory from '@/components/ExpensesByCategory';
 import ExpensesByCard from '@/components/ExpensesByCard';
 import MonthlyTrendChart from '@/components/MonthlyTrendChart';
 import RecentTransactions from '@/components/RecentTransactions';
-import FinancialAdviceCard from '@/components/FinancialAdviceCard';
 import ExpenseForm from '@/components/ExpenseForm';
 import {ExpenseVO} from '@/types';
 import { formatCurrency, getCurrentMonthYear } from '@/utils/formatters';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { 
-  fetchFinancialAdvice,
-  fetchSummary,
-} from '@/services/api';
 import {create, getAll} from "@/services/expenseService.ts";
+import {getLastIncome} from "@/services/incomeService.ts";
 
 const Index = () => {
   const queryClient = useQueryClient();
@@ -38,21 +34,13 @@ const Index = () => {
       return getAll(year, month);
     }
   });
-  
-  const { 
-    data: financialAdviceData = [], 
-    isLoading: isLoadingAdvice 
+
+  const {
+    data: lastIncome,
+    isLoading: isLoadingIncome
   } = useQuery({
-    queryKey: ['financialAdvice'],
-    queryFn: fetchFinancialAdvice
-  });
-  
-  const { 
-    data: summary, 
-    isLoading: isLoadingSummary 
-  } = useQuery({
-    queryKey: ['summary'],
-    queryFn: fetchSummary
+    queryKey: ['lastIncome'],
+    queryFn: getLastIncome
   });
 
   const apiAddExpense = async (newExpense: ExpenseVO) => {
@@ -85,7 +73,7 @@ const Index = () => {
     });
   };
   
-  const isLoading = isLoadingExpenses || isLoadingAdvice || isLoadingSummary;
+  const isLoading = isLoadingExpenses  || isLoadingIncome;
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,11 +101,11 @@ const Index = () => {
               <div key={i} className="h-32 bg-card/50 animate-pulse rounded-xl"></div>
             ))}
           </div>
-        ) : summary ? (
+        ) : lastIncome ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <SummaryCard 
               title="Receita Mensal" 
-              amount={summary.totalIncome}
+              amount={lastIncome.amount}
               description="Entrada fixa mensal"
               icon="income"
               variant="income"
@@ -131,14 +119,14 @@ const Index = () => {
             />
             <SummaryCard 
               title="Saldo" 
-              amount={summary.totalIncome - expenses.reduce((acc, expense) => acc + expense.amount, 0)}
+              amount={lastIncome.amount - expenses.reduce((acc, expense) => acc + expense.amount, 0)}
               description="Disponível para economizar ou investir"
               icon="balance"
               variant="balance"
             />
             <SummaryCard 
               title="Taxa de Poupança"
-              amount={((summary.totalIncome - expenses.reduce((acc, expense) => acc + expense.amount, 0)) / summary.totalIncome) * 100}
+              amount={((lastIncome.amount - expenses.reduce((acc, expense) => acc + expense.amount, 0)) / lastIncome.amount) * 100}
               description="Percentual da receita economizado"
               icon="savings-rate"
               variant="savings-rate"
@@ -146,7 +134,7 @@ const Index = () => {
             />
           </div>
         ) : null}
-        
+
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <MonthlyTrendChart />
@@ -165,22 +153,22 @@ const Index = () => {
             />
           </div>
           <div>
-            <div className="bg-card border border-border/50 rounded-xl p-4 shadow-card">
-              <h3 className="font-medium mb-4">Sugestões Financeiras</h3>
-              {isLoadingAdvice ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-24 bg-background/50 animate-pulse rounded-lg"></div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {financialAdviceData.map((advice) => (
-                    <FinancialAdviceCard key={advice.id} advice={advice} />
-                  ))}
-                </div>
-              )}
-            </div>
+            {/*<div className="bg-card border border-border/50 rounded-xl p-4 shadow-card">*/}
+            {/*  <h3 className="font-medium mb-4">Sugestões Financeiras</h3>*/}
+            {/*  {isLoadingAdvice ? (*/}
+            {/*    <div className="space-y-4">*/}
+            {/*      {[...Array(3)].map((_, i) => (*/}
+            {/*        <div key={i} className="h-24 bg-background/50 animate-pulse rounded-lg"></div>*/}
+            {/*      ))}*/}
+            {/*    </div>*/}
+            {/*  ) : (*/}
+            {/*    <div className="space-y-4">*/}
+            {/*      {financialAdviceData.map((advice) => (*/}
+            {/*        <FinancialAdviceCard key={advice.id} advice={advice} />*/}
+            {/*      ))}*/}
+            {/*    </div>*/}
+            {/*  )}*/}
+            {/*</div>*/}
           </div>
         </div>
       </main>
