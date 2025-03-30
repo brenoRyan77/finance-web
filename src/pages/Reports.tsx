@@ -5,36 +5,43 @@ import ExpensesByCategory from '@/components/ExpensesByCategory';
 import ExpensesByCard from '@/components/ExpensesByCard';
 import MonthlyTrendChart from '@/components/MonthlyTrendChart';
 import { Button } from '@/components/ui/button';
-import { ExpenseVO} from '@/types';
+import {ExpenseVO, Income} from '@/types';
 import { addMonths, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { formatMonthYear, formatCurrency } from '@/utils/formatters';
 import {getAll, getMonthlySummary} from "@/services/expenseService.ts";
 import { useToast} from "@/hooks/use-toast.ts";
+import {getLastIncome} from "@/services/incomeService.ts";
 
 const Reports = () => {
   const [expenses, setExpenses] = useState<ExpenseVO[]>([]);
   const [filteredExpenses, setFilteredExpenses] = useState<ExpenseVO[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
+  const { toast } = useToast();
+  const [incomes, setIncomes] = useState<Income | null>(null);
 
   useEffect(() => {
-    const loadExpenses = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       try {
-        const response = await getAll(selectedDate.getFullYear(), selectedDate.getMonth() + 1);
-        setExpenses(response);
-      }catch (error) {
-        console.error('Error retrieving expenses from localStorage:', error);
+        const [expensesResponse, incomeResponse] = await Promise.all([
+          getAll(selectedDate.getFullYear(), selectedDate.getMonth() + 1),
+          getLastIncome(),
+        ]);
+        setExpenses(expensesResponse);
+        setIncomes(incomeResponse);
+      } catch (error) {
+        console.error('Error loading data:', error);
         toast({
           title: 'Erro',
-          description: 'Erro ao carregar despesas',
-        })
+          description: 'Erro ao carregar dados',
+        });
       } finally {
         setIsLoading(false);
       }
     };
-    loadExpenses();
+
+    loadData();
   }, [selectedDate]);
 
   useEffect(() => {
@@ -61,7 +68,7 @@ const Reports = () => {
 
   const calculateMonthlySummary = () => {
     const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const totalIncome = 4750;
+    const totalIncome = incomes?.amount || 0; // Assuming the last income is the monthly income
     const balance = totalIncome - totalExpenses;
     const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
     
