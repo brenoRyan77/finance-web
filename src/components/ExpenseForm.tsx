@@ -168,7 +168,7 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
                         </SelectTrigger>
                         <SelectContent>
                             {categories.map((cat) => (
-                                <SelectItem key={cat.id} value={cat.id}>
+                                <SelectItem key={cat.id} value={cat.id.toString()}>
                                     <div className="flex items-center gap-2">
                                         <div
                                             className="w-3 h-3 rounded-full"
