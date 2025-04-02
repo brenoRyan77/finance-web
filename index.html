@@ -19,6 +19,8 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <link rel="manifest" href="/manifest.json" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
     
     <!-- Prevent caching during development -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -29,5 +31,14 @@
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+                  .then(reg => console.log('Service Worker registrado:', reg))
+                  .catch(err => console.error('Erro no Service Worker:', err));
+        });
+      }
+    </script>
   </body>
 </html>
