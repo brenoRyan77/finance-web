@@ -6,7 +6,7 @@ import ExpensesByCard from '@/components/ExpensesByCard';
 import MonthlyTrendChart from '@/components/MonthlyTrendChart';
 import { Button } from '@/components/ui/button';
 import {ExpenseVO, Income} from '@/types';
-import { addMonths, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { addMonths, subMonths, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 import { formatMonthYear, formatCurrency } from '@/utils/formatters';
 import {getAll, getMonthlySummary} from "@/services/expenseService.ts";
 import { useToast} from "@/hooks/use-toast.ts";
@@ -48,12 +48,14 @@ const Reports = () => {
     if (!isLoading) {
       const monthStart = startOfMonth(selectedDate);
       const monthEnd = endOfMonth(selectedDate);
-      
+
       const filtered = expenses.filter(expense => {
-        const expenseDate = new Date(expense.date);
-        return expenseDate >= monthStart && expenseDate <= monthEnd;
+        let expenseDate = parseISO(expense.date.toString());
+        expenseDate = new Date(expenseDate.setHours(12, 0, 0, 0));
+        return isWithinInterval(expenseDate, { start: monthStart, end: monthEnd });
       });
-      
+
+
       setFilteredExpenses(filtered);
     }
   }, [expenses, selectedDate, isLoading]);

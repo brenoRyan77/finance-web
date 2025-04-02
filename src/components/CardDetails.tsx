@@ -9,7 +9,7 @@ import {
     AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { formatCurrency } from '@/utils/formatters';
-import { format } from 'date-fns';
+import {format, parseISO} from 'date-fns';
 import {CardDetails, ExpenseVO} from '@/types';
 import { ShoppingBag, Calendar } from 'lucide-react';
 
@@ -74,7 +74,7 @@ const CardDetailsModal = ({ card, expenses, isOpen, onClose }: CardDetailsProps)
                                                 <p className="font-medium text-sm">{expense.description}</p>
                                                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                                     <Calendar className="h-3 w-3" />
-                                                    {format(new Date(expense.date), 'dd/MM/yyyy')}
+                                                    {format(new Date(parseISO(expense.date.toString()).setHours(12, 0, 0, 0)), 'dd/MM/yyyy')}
                                                 </div>
                                             </div>
                                         </div>

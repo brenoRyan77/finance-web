@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import Header from '@/components/Header';
 import {Button} from '@/components/ui/button';
-import {addMonths, subMonths, format, startOfMonth, endOfMonth} from 'date-fns';
+import {addMonths, subMonths, format, startOfMonth, endOfMonth, parseISO, isWithinInterval} from 'date-fns';
 import {CardDetails} from '@/types';
 import {formatCurrency, formatMonthYear} from '@/utils/formatters';
 import {Calendar, CreditCard, DollarSign, Loader} from 'lucide-react';
@@ -72,8 +72,9 @@ const Cards = () => {
         if (!card) return [];
 
         return card.expenseVOS.filter(expense => {
-            const expenseDate = new Date(expense.date);
-            return expenseDate >= monthStart && expenseDate <= monthEnd;
+            let expenseDate = parseISO(expense.date.toString());
+            expenseDate = new Date(expenseDate.setHours(12, 0, 0, 0));
+            return isWithinInterval(expenseDate, { start: monthStart, end: monthEnd });
         });
     };
 
