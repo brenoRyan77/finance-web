@@ -1,10 +1,10 @@
 
 {
+  "id": "/",
   "name": "Finanças Pessoais",
   "short_name": "Finanças",
   "description": "Aplicativo para gerenciamento de finanças pessoais",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#8a05be",
