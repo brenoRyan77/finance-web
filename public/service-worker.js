@@ -58,3 +58,22 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+self.addEventListener("install", (event) => {
+    self.skipWaiting(); // Ativar a nova versão imediatamente
+});
+
+self.addEventListener("activate", (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== "financas-pessoais-v1") {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+    clients.claim(); // Garantir que o Service Worker assuma o controle imediatamente
+});
