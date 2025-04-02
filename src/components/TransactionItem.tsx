@@ -5,7 +5,7 @@ import {cn} from '@/lib/utils';
 import {useEffect, useState} from "react";
 import {fetchCategories} from "@/services/categoryService.ts";
 import {fetchCards} from "@/services/cardService.ts";
-import {format} from "date-fns";
+import {format, parseISO} from "date-fns";
 import TransactionDetails from "@/components/TransactionDetails.tsx";
 
 interface TransactionItemProps {
@@ -98,10 +98,10 @@ const TransactionItem = ({transaction, onClick}: TransactionItemProps) => {
                     <div>
                         <p className="font-medium text-foreground">{transaction.description}</p>
                         <div className="text-xs text-muted-foreground flex items-center mt-0.5">
-                            <span>{format(transaction.date, 'dd/MM/yyyy')}</span>
+                            <span>{format(new Date(parseISO(transaction.date.toString()).setHours(12, 0, 0, 0)), 'dd/MM/yyyy')}</span>
                             <span className="mx-1.5">•</span>
                             <span className="flex items-center">
-                  {getPaymentIcon()}
+                                {getPaymentIcon()}
                                 <span className="ml-1">
                     {card?.name || 'Dinheiro'}{getInstallmentText()}
                   </span>

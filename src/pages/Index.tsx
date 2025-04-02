@@ -126,7 +126,7 @@ const Index = () => {
             />
             <SummaryCard 
               title="Taxa de Poupança"
-              amount={((lastIncome.amount - expenses.reduce((acc, expense) => acc + expense.amount, 0)) / lastIncome.amount) * 100}
+              amount={Number((((lastIncome.amount - expenses.reduce((acc, expense) => acc + expense.amount, 0)) / lastIncome.amount) * 100).toFixed(2))}
               description="Percentual da receita economizado"
               icon="savings-rate"
               variant="savings-rate"

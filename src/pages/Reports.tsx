@@ -70,10 +70,11 @@ const Reports = () => {
 
   const calculateMonthlySummary = () => {
     const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const totalIncome = incomes?.amount || 0; // Assuming the last income is the monthly income
+    const totalIncome = incomes?.amount || 0;
     const balance = totalIncome - totalExpenses;
-    const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
-    
+    const savingsRate = totalIncome > 0
+        ? Number((((totalIncome - totalExpenses) / totalIncome) * 100))
+        : 0;
     return {
       totalExpenses,
       totalIncome,
@@ -176,7 +177,7 @@ const Reports = () => {
               </div>
               <div className="text-sm font-medium">Taxa de Poupança</div>
             </div>
-            <div className="text-2xl font-bold">{summary.savingsRate.toFixed(2)}%</div>
+            <div className="text-2xl font-bold">{summary.savingsRate.toFixed(1)}%</div>
             <div className="text-sm text-muted-foreground mt-1">Percentual da receita economizado</div>
           </div>
         </div>
