@@ -254,7 +254,7 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
                 <div className="space-y-2">
                     <Label htmlFor="installments">Número de Parcelas</Label>
                     <div className="flex flex-wrap gap-2">
-                        {[2,3,4,6,8,10,12].map((num) => (
+                        {[2,3,4,5,6,7,8,9,10,12].map((num) => (
                             <Button
                                 key={num}
                                 type="button"
