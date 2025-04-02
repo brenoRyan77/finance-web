@@ -5,7 +5,7 @@
   "description": "Aplicativo para gerenciamento de finanças pessoais",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#ffffff",
   "theme_color": "#8a05be",
   "orientation": "portrait-primary",
