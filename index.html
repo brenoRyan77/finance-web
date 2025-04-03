@@ -1,44 +1,38 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    <title>FinTrack</title>
-    <meta name="description" content="Aplicativo para gerenciamento de finanças pessoais" />
-    <meta name="author" content="Lovable" />
-    <meta property="og:image" content="/og-image.png" />
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#8a05be" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Finanças Pessoais" />
-    
-    <!-- PWA Icons -->
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-    <link rel="manifest" href="/manifest.json" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no" />
+  <title>Finanças Pessoais</title>
+  <meta name="description" content="Aplicativo para gerenciamento de finanças pessoais" />
+  <meta name="author" content="Lovable" />
+  <meta property="og:image" content="/og-image.png" />
 
-    <meta name="mobile-web-app-capable" content="yes" />
-    
-    <!-- Prevent caching during development -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  </head>
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#8a05be" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Finanças Pessoais" />
+  <meta name="application-name" content="Finanças Pessoais" />
 
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-                  .then(reg => console.log('Service Worker registrado:', reg))
-                  .catch(err => console.error('Erro no Service Worker:', err));
-        });
-      }
-    </script>
-  </body>
+  <!-- PWA Icons -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-152x152.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Prevent caching during development -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+</head>
+
+<body>
+<div id="root"></div>
+<!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+<script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+<script type="module" src="/src/main.tsx"></script>
+</body>
 </html>
