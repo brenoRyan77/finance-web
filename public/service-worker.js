@@ -1,4 +1,7 @@
 
+/// <reference lib="webworker" />
+/* eslint-disable no-restricted-globals */
+
 const CACHE_NAME = 'financas-pessoais-v1';
 const urlsToCache = [
     '/',
@@ -38,6 +41,7 @@ self.addEventListener('activate', (event) => {
                     if (cacheWhitelist.indexOf(cacheName) === -1) {
                         return caches.delete(cacheName);
                     }
+                    return null;
                 })
             );
         })
@@ -79,7 +83,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('fetch', (event) => {
     if (event.request.mode === 'navigate' ||
         (event.request.method === 'GET' &&
-            event.request.headers.get('accept').includes('text/html'))) {
+            event.request.headers.get('accept')?.includes('text/html'))) {
         event.respondWith(
             fetch(event.request).catch(() => {
                 return caches.match('/');
