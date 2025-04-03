@@ -15,7 +15,10 @@ const urlsToCache = [
     '/icons/icon-152x152.png',
     '/icons/icon-192x192.png',
     '/icons/icon-384x384.png',
-    '/icons/icon-512x512.png'
+    '/icons/icon-512x512.png',
+    // Adicionar mais recursos essenciais para funcionamento offline
+    '/assets/index.css',
+    '/assets/index.js'
 ];
 
 // Instalação do Service Worker
@@ -50,44 +53,78 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Estratégia de cache: Network first, então fallback para cache
+// Função para verificar se uma requisição é cacheável
+function isRequestCacheable(request) {
+    // Verificar se é uma requisição GET
+    if (request.method !== 'GET') {
+        return false;
+    }
+
+    // Verificar se a URL é válida e é do mesmo origem
+    const url = new URL(request.url);
+    if (!url.protocol.startsWith('http')) {
+        return false;
+    }
+
+    // Verificar se não é uma requisição de API ou de terceiros
+    if (!request.url.startsWith(self.location.origin)) {
+        return false;
+    }
+
+    return true;
+}
+
+// Manusear requisições de rede - Estratégia network first com fallback para cache
 self.addEventListener('fetch', (event) => {
+    // Não interceptar requisições para URLs de terceiros
+    if (!event.request.url.startsWith(self.location.origin)) {
+        return;
+    }
+
+    // Para recursos HTML (navegação), sempre tente rede primeiro, depois cache
+    if (event.request.mode === 'navigate' ||
+        (event.request.method === 'GET' &&
+            event.request.headers.get('accept')?.includes('text/html'))) {
+        event.respondWith(
+            fetch(event.request)
+                .catch(() => {
+                    return caches.match(event.request) || caches.match('/');
+                })
+        );
+        return;
+    }
+
+    // Para outros recursos, use network-first com fallback para cache
     event.respondWith(
         fetch(event.request)
             .then((response) => {
                 // Clone da resposta
                 const responseToCache = response.clone();
 
-                // Atualizar cache
-                caches.open(CACHE_NAME)
-                    .then((cache) => {
-                        // Ignorar requisições de API e de terceiros
-                        if (event.request.url.startsWith(self.location.origin)) {
-                            cache.put(event.request, responseToCache);
-                        }
-                    });
+                // Atualizar cache apenas para requisições válidas
+                if (isRequestCacheable(event.request) && response.status === 200) {
+                    caches.open(CACHE_NAME)
+                        .then((cache) => {
+                            try {
+                                cache.put(event.request, responseToCache);
+                            } catch (error) {
+                                console.error('Erro ao armazenar no cache:', error);
+                            }
+                        });
+                }
 
                 return response;
             })
             .catch(() => {
                 // Se a rede falhar, tentar servir do cache
-                return caches.match(event.request)
-                    .then(response => {
-                        return response || caches.match('/');
-                    });
+                return caches.match(event.request);
             })
     );
 });
 
-// Garantir que o app funcione offline
-self.addEventListener('fetch', (event) => {
-    if (event.request.mode === 'navigate' ||
-        (event.request.method === 'GET' &&
-            event.request.headers.get('accept')?.includes('text/html'))) {
-        event.respondWith(
-            fetch(event.request).catch(() => {
-                return caches.match('/');
-            })
-        );
+// Evento de mensagem para atualizações
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
     }
 });
