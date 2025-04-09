@@ -1,123 +1,85 @@
-
-/// <reference lib="webworker" />
-/* eslint-disable no-restricted-globals */
-
-const CACHE_NAME = 'financas-pessoais-v1';
+const CACHE_NAME = 'financas-pessoais-v2';
 const urlsToCache = [
     '/',
     '/index.html',
     '/manifest.json',
     '/favicon.ico',
-    '/icons/icon-72x72.png',
-    '/icons/icon-96x96.png',
-    '/icons/icon-128x128.png',
-    '/icons/icon-144x144.png',
-    '/icons/icon-152x152.png',
-    '/icons/icon-192x192.png',
-    '/icons/icon-384x384.png',
-    '/icons/icon-512x512.png',
-    // Adicionar mais recursos essenciais para funcionamento offline
-    '/assets/index.css',
-    '/assets/index.js'
+    '/icon-base.svg',
 ];
 
-// Instalação do Service Worker
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Cache aberto');
+            .then(cache => {
+                console.log('Opened cache');
                 return cache.addAll(urlsToCache);
             })
     );
-    // Force the waiting service worker to become the active service worker
-    self.skipWaiting();
 });
 
-// Ativação do Service Worker
-self.addEventListener('activate', (event) => {
+// Activate and clean up old caches
+self.addEventListener('activate', event => {
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
+        caches.keys().then(cacheNames => {
             return Promise.all(
-                cacheNames.map((cacheName) => {
+                cacheNames.map(cacheName => {
                     if (cacheWhitelist.indexOf(cacheName) === -1) {
                         return caches.delete(cacheName);
                     }
-                    return null;
                 })
             );
         })
     );
-    // Claim any clients immediately
-    self.clients.claim();
 });
 
-// Função para verificar se uma requisição é cacheável
-function isRequestCacheable(request) {
-    // Verificar se é uma requisição GET
-    if (request.method !== 'GET') {
-        return false;
-    }
-
-    // Verificar se a URL é válida e é do mesmo origem
-    const url = new URL(request.url);
-    if (!url.protocol.startsWith('http')) {
-        return false;
-    }
-
-    // Verificar se não é uma requisição de API ou de terceiros
-    if (!request.url.startsWith(self.location.origin)) {
-        return false;
-    }
-
-    return true;
-}
-
-// Manusear requisições de rede - Estratégia network first com fallback para cache
-self.addEventListener('fetch', (event) => {
-    // Não interceptar requisições para URLs de terceiros
-    if (!event.request.url.startsWith(self.location.origin)) {
-        return;
-    }
-
-    // Para recursos HTML (navegação), sempre tente rede primeiro, depois cache
-    if (event.request.mode === 'navigate' ||
-        (event.request.method === 'GET' &&
-            event.request.headers.get('accept')?.includes('text/html'))) {
-        event.respondWith(
-            fetch(event.request)
-                .catch(() => {
-                    return caches.match(event.request) || caches.match('/');
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
                 })
-        );
-        return;
-    }
+            );
+        })
+    );
+});
 
-    // Para outros recursos, use network-first com fallback para cache
+// Serve cached content when offline
+self.addEventListener('fetch', event => {
     event.respondWith(
-        fetch(event.request)
-            .then((response) => {
-                // Clone da resposta
-                const responseToCache = response.clone();
-
-                // Atualizar cache apenas para requisições válidas
-                if (isRequestCacheable(event.request) && response.status === 200) {
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            try {
-                                cache.put(event.request, responseToCache);
-                            } catch (error) {
-                                console.error('Erro ao armazenar no cache:', error);
-                            }
-                        });
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    return response;
                 }
+                return fetch(event.request).then(
+                    response => {
+                        // Check if we received a valid response
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
 
-                return response;
+                        // Clone the response
+                        var responseToCache = response.clone();
+
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+
+                        return response;
+                    }
+                );
             })
             .catch(() => {
-                // Se a rede falhar, tentar servir do cache
-                return caches.match(event.request);
+                // If both cache and network fail, show a generic fallback:
+                if (event.request.url.indexOf('/api/') === -1) {
+                    return caches.match('/index.html');
+                }
             })
     );
 });
