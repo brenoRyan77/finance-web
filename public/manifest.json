@@ -5,11 +5,8 @@
   "description": "Aplicativo para gerenciamento de finanças pessoais",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#8a05be",
-  "id": "/",
-  "scope": "/",
   "icons": [
     {
       "src": "icon-base.svg",
