@@ -2,24 +2,17 @@ import { apiUrl } from "@/config.ts";
 
 class ApiClient {
     private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-        const token = sessionStorage.getItem('token');
-
         const headers = new Headers(options.headers || {});
         headers.set('Content-Type', 'application/json');
-
-        if (token && endpoint !== '/auth/login') {
-            headers.set('Authorization', `Bearer ${token}`);
-        }
 
         const response = await fetch(`${apiUrl}${endpoint}`, {
             ...options,
             headers,
+            credentials: "include"
         });
 
         if (!response.ok) {
             if (response.status === 401) {
-                sessionStorage.removeItem('token');
-                sessionStorage.removeItem('user');
                 window.location.href = '/login';
             }
 

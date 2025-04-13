@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart3, CreditCard, Home, LogOut, Menu, Settings, X } from 'lucide-react';
+import {logout} from "@/services/authService.ts";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -43,10 +44,9 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('isAuthenticated');
-    sessionStorage.removeItem('username');
-    sessionStorage.removeItem('token');
+  const handleLogout = async () => {
+    sessionStorage.clear();
+    await logout();
     toast({
       title: "Logout realizado",
       description: "Você saiu da sua conta."

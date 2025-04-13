@@ -40,8 +40,6 @@ const Login = () => {
       }
 
       sessionStorage.setItem('token', response.accessToken);
-      sessionStorage.setItem('username', response.username);
-      sessionStorage.setItem('isAuthenticated', String(response.authenticated));
 
       const responseUser = await getUserByLogin(response.username);
       sessionStorage.setItem('user', JSON.stringify(responseUser));
