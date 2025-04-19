@@ -118,6 +118,31 @@ const Transactions = () => {
     setSelectedDate(prev => addMonths(prev, 1));
   };
 
+  const handleEditExpense = (updatedExpense: ExpenseVO) => {
+    const updatedExpenses = expenses.map(expense =>
+        expense.id === updatedExpense.id ? updatedExpense : expense
+    );
+
+    setExpenses(updatedExpenses);
+
+    toast({
+      title: "Despesa atualizada",
+      description: `${updatedExpense.description} - ${formatCurrency(updatedExpense.amount)}`,
+    });
+  };
+
+  const handleDeleteExpense = (id: string) => {
+    const updatedExpenses = expenses.filter(expense => expense.id !== id);
+    setExpenses(updatedExpenses);
+
+    toast({
+      title: "Despesa excluída",
+      description: "A despesa foi excluída com sucesso",
+    });
+
+    extractAvailableMonths(updatedExpenses);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -185,6 +210,8 @@ const Transactions = () => {
         <RecentTransactions 
           expenses={filteredExpenses} 
           onAddExpense={handleAddExpense}
+            onEditExpense={handleEditExpense}
+            onDeleteExpense={handleDeleteExpense}
         />
       </main>
     </div>

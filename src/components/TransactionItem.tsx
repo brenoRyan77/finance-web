@@ -1,22 +1,41 @@
 import {CardInfo, CategoryVO, ExpenseVO} from '@/types';
 import {formatCurrency} from '@/utils/formatters';
-import {CreditCard, Banknote, CalendarClock, BadgeDollarSign} from 'lucide-react';
+import {CreditCard, Banknote, CalendarClock, BadgeDollarSign, Trash2} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {useEffect, useState} from "react";
 import {fetchCategories} from "@/services/categoryService.ts";
 import {fetchCards} from "@/services/cardService.ts";
 import {format, parseISO} from "date-fns";
 import TransactionDetails from "@/components/TransactionDetails.tsx";
+import {useToast} from "@/hooks/use-toast.ts";
+import {useIsMobile} from "@/hooks/use-mobile.tsx";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from './ui/button';
+
 
 interface TransactionItemProps {
     transaction: ExpenseVO;
     onClick?: () => void;
+    onDelete?: (id: string) => void;
+    showDetailsInline?: boolean; //
 }
 
-const TransactionItem = ({transaction, onClick}: TransactionItemProps) => {
+const TransactionItem = ({transaction, onClick, onDelete, showDetailsInline = true}: TransactionItemProps) => {
     const [categories, setCategories] = useState<CategoryVO[]>([]);
     const [cards, setCards] = useState<CardInfo[]>([]);
     const [showDetails, setShowDetails] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const { toast } = useToast();
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -61,8 +80,20 @@ const TransactionItem = ({transaction, onClick}: TransactionItemProps) => {
     };
 
     const handleClick = () => {
-        setShowDetails(true);
-        if (onClick) onClick();
+        // If we're not supposed to show details inline, always use the parent's onClick handler
+        if (!showDetailsInline) {
+            if (onClick) onClick();
+            return;
+        }
+
+        // Only show details inline on mobile when showDetailsInline is true
+        if (isMobile && showDetailsInline) {
+            setShowDetails(true);
+        }
+        // On desktop or when not showing details inline, use the parent's onClick if provided
+        else if (onClick) {
+            onClick();
+        }
     };
 
     const getInstallmentText = () => {
@@ -72,12 +103,30 @@ const TransactionItem = ({transaction, onClick}: TransactionItemProps) => {
         return '';
     };
 
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowDeleteConfirm(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (onDelete) {
+            onDelete(transaction.id);
+            toast({
+                title: "Despesa excluída",
+                description: "A despesa foi excluída com sucesso",
+            });
+        }
+        setShowDeleteConfirm(false);
+    };
+
     return (
         <>
             <div
                 className={cn(
                     "group flex items-center justify-between p-3 rounded-lg transition-all duration-200",
-                    "hover:bg-primary/5 cursor-pointer border border-transparent hover:border-border/50"
+                    "hover:bg-primary/5 cursor-pointer border border-transparent hover:border-border/50",
+                    "active:bg-primary/10", // Added active state for better mobile feedback
+                    "relative" // Added to position the delete button
                 )}
                 onClick={handleClick}
             >
@@ -111,24 +160,62 @@ const TransactionItem = ({transaction, onClick}: TransactionItemProps) => {
                 </div>
 
                 {/* Right side: Amount */}
-                <div className="text-right">
-                    <p className="font-medium text-destructive">
-                        -{formatCurrency(transaction.amount)}
-                    </p>
-                    {category && (
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                            {category.name}
+                <div className="text-right flex items-center gap-3">
+                    <div>
+                        <p className="font-medium text-destructive">
+                            -{formatCurrency(transaction.amount)}
                         </p>
+                        {category && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                                {category.name}
+                            </p>
+                        )}
+                    </div>
+
+                    {onDelete && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn(
+                                "h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10",
+                                isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100 transition-opacity"
+                            )}
+                            onClick={handleDeleteClick}
+                            aria-label="Excluir transação"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
                     )}
                 </div>
 
             </div>
             {/* Transaction Details Dialog */}
-            <TransactionDetails
-                transaction={transaction}
-                isOpen={showDetails}
-                onClose={() => setShowDetails(false)}
-            />
+            {showDetailsInline && (
+                <TransactionDetails
+                    transaction={transaction}
+                    isOpen={showDetails}
+                    onClose={() => setShowDetails(false)}
+                />
+            )}
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tem certeza que deseja excluir a despesa "{transaction.description}"?
+                            Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setShowDeleteConfirm(false)}>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">
+                            Excluir
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 };

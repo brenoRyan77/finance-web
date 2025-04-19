@@ -12,3 +12,7 @@ export const getAll = async(year: number, month: number): Promise<ExpenseVO[]> =
 export const getMonthlySummary = async(year: number, month: number): Promise<MonthlyData> => {
     return apiClient.get<MonthlyData>(`/expenses/summary?year=${year}&month=${month}`);
 }
+
+export const deleteExpense = async(id: string): Promise<void> => {
+    return apiClient.delete(`/expenses/${id}`);
+}

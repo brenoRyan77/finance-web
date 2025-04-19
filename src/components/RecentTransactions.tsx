@@ -1,22 +1,27 @@
 
 import { useState } from 'react';
-import {Expense, ExpenseVO} from '@/types';
+import {ExpenseVO} from '@/types';
 import TransactionItem from './TransactionItem';
 import ExpenseForm from './ExpenseForm';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/utils/formatters';
 import { Plus } from 'lucide-react';
+import TransactionDetails from "@/components/TransactionDetails.tsx";
 
 interface RecentTransactionsProps {
   expenses: ExpenseVO[];
   onAddExpense: (expense: ExpenseVO) => void;
+  onDeleteExpense?: (id: string) => void;
+  onEditExpense?: (expense: ExpenseVO) => void;
 }
 
-const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps) => {
+const RecentTransactions = ({ expenses, onAddExpense, onDeleteExpense, onEditExpense }: RecentTransactionsProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<ExpenseVO | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
-  
+
   const displayLimit = expanded ? expenses.length : 5;
   
   const sortedExpenses = [...expenses].sort((a, b) =>
@@ -31,6 +36,22 @@ const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps)
       title: "Despesa adicionada",
       description: `${expense.description} - ${formatCurrency(expense.amount)}`,
     });
+  };
+
+  const handleEditExpense = (expense: ExpenseVO) => {
+    if (onEditExpense) {
+      onEditExpense(expense);
+      setShowDetails(false);
+      toast({
+        title: "Despesa atualizada",
+        description: `${expense.description} - ${formatCurrency(expense.amount)}`,
+      });
+    }
+  };
+
+  const handleTransactionClick = (transaction: ExpenseVO) => {
+    setSelectedTransaction(transaction);
+    setShowDetails(true);
   };
   
   return (
@@ -50,7 +71,10 @@ const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps)
           {displayedExpenses.map((expense) => (
             <TransactionItem 
               key={expense.id} 
-              transaction={expense} 
+              transaction={expense}
+              onClick={() => handleTransactionClick(expense)}
+              onDelete={onDeleteExpense}
+              showDetailsInline={false} // Set to false to prevent duplicate modals
             />
           ))}
         </div>
@@ -70,6 +94,15 @@ const RecentTransactions = ({ expenses, onAddExpense }: RecentTransactionsProps)
         >
           {expanded ? "Ver menos" : `Ver mais ${expenses.length - 5} transações`}
         </Button>
+      )}
+
+      {selectedTransaction && (
+          <TransactionDetails
+              transaction={selectedTransaction}
+              isOpen={showDetails}
+              onClose={() => setShowDetails(false)}
+              onEdit={onEditExpense ? handleEditExpense : undefined}
+          />
       )}
     </div>
   );

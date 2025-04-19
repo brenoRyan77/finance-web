@@ -11,16 +11,18 @@ import {
 import { Button } from "@/components/ui/button";
 import {ExpenseVO} from '@/types';
 import { formatCurrency, formatDate } from '@/utils/formatters';
-import { CalendarIcon, CreditCardIcon, TagIcon, InfoIcon } from 'lucide-react';
+import {CalendarIcon, CreditCardIcon, TagIcon, InfoIcon, PencilIcon} from 'lucide-react';
 import {format} from "date-fns";
+import ExpenseForm from "@/components/ExpenseForm.tsx";
 
 interface TransactionDetailsProps {
     transaction: ExpenseVO;
     isOpen: boolean;
     onClose: () => void;
+    onEdit?: (expense: ExpenseVO) => void;
 }
 
-const TransactionDetails = ({ transaction, isOpen, onClose }: TransactionDetailsProps) => {
+const TransactionDetails = ({ transaction, isOpen, onClose, onEdit }: TransactionDetailsProps) => {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="max-w-md">
@@ -80,8 +82,15 @@ const TransactionDetails = ({ transaction, isOpen, onClose }: TransactionDetails
                     </div>
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className="gap-2">
                     <Button variant="outline" onClick={onClose}>Fechar</Button>
+                    {onEdit && (
+                        <ExpenseForm onSubmit={onEdit} initialExpense={transaction}>
+                            <Button variant="outline" className="gap-2">
+                                <span>Editar</span>
+                            </Button>
+                        </ExpenseForm>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

@@ -12,7 +12,7 @@ import {ExpenseVO} from '@/types';
 import { formatCurrency, getCurrentMonthYear } from '@/utils/formatters';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import {create, getAll} from "@/services/expenseService.ts";
+import {create, deleteExpense, getAll} from "@/services/expenseService.ts";
 import {getLastIncome} from "@/services/incomeService.ts";
 
 const Index = () => {
@@ -72,7 +72,34 @@ const Index = () => {
       }
     });
   };
-  
+
+  const handleEditExpense = (updatedExpense: ExpenseVO) => {
+    toast({
+      title: "Despesa atualizada",
+      description: `${updatedExpense.description} - ${formatCurrency(updatedExpense.amount)}`,
+    });
+  };
+
+  const handleDeleteExpense = async (id: string) => {
+    try {
+      await deleteExpense(id);
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['summary'] });
+
+      toast({
+        title: "Despesa excluída",
+        description: "A despesa foi excluída com sucesso",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao excluir despesa",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+
   const isLoading = isLoadingExpenses  || isLoadingIncome;
 
   return (
@@ -149,7 +176,9 @@ const Index = () => {
           <div className="lg:col-span-2">
             <RecentTransactions 
               expenses={expenses} 
-              onAddExpense={handleAddExpense} 
+              onAddExpense={handleAddExpense}
+              onDeleteExpense={handleDeleteExpense}
+              onEditExpense={handleEditExpense}
             />
           </div>
           <div>

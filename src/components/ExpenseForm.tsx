@@ -25,7 +25,7 @@ import {CardType, PaymentMethod, Category, CardInfo, ExpenseVO} from '@/types';
 import {format} from 'date-fns';
 import {CalendarIcon, Plus, CreditCard, Wallet} from 'lucide-react';
 import {cn} from '@/lib/utils';
-import {parseCurrency} from '@/utils/formatters';
+import {formatCurrency, parseCurrency} from '@/utils/formatters';
 import {fetchCategories} from "@/services/categoryService.ts";
 import {fetchCardsByUser} from "@/services/cardService.ts";
 import {useIsMobile} from "@/hooks/use-mobile.tsx";
@@ -34,9 +34,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger
 interface ExpenseFormProps {
     onSubmit: (expense: ExpenseVO) => void;
     children?: React.ReactNode;
+    initialExpense?: ExpenseVO;
 }
 
-const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
+const ExpenseForm = ({onSubmit, children, initialExpense}: ExpenseFormProps) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
@@ -50,6 +51,7 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
     const [userCards, setUserCards] = useState<CardInfo[]>([]);
     const [userCardId, setUserCardId] = useState<number | undefined>(undefined);
     const isMobile = useIsMobile();
+    const [isEditMode, setIsEditMode] = useState(false);
 
     const resetForm = () => {
         setDescription('');
@@ -61,6 +63,23 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
         setInstallments(1);
         setNotes('');
     };
+
+    useEffect(() => {
+        if (initialExpense) {
+            setIsEditMode(true);
+            setDescription(initialExpense.description);
+            setAmount(formatCurrency(initialExpense.amount).replace('R$', '').trim());
+            setDate(new Date(initialExpense.date));
+            setCategory(initialExpense.categoryId);
+            setCardType(initialExpense.card.type);
+            setPaymentMethod(initialExpense.paymentMethod);
+            setNotes(initialExpense.observation || '');
+
+            if (initialExpense.installments) {
+                setInstallments(initialExpense.installments);
+            }
+        }
+    }, [initialExpense]);
 
     useEffect(() => {
         fetchCategories().then(setCategories);
@@ -78,6 +97,7 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
         const userCardIdNovo = userCards.find(card => card.type === cardType)?.userCardId;
 
         const newExpense: ExpenseVO = {
+            id: isEditMode ? initialExpense?.id : undefined,
             description,
             amount: parseCurrency(amount),
             date,
@@ -89,7 +109,8 @@ const ExpenseForm = ({onSubmit, children}: ExpenseFormProps) => {
 
         if (paymentMethod === 'installment') {
             newExpense.installments = installments;
-            newExpense.currentInstallment = 1;
+            newExpense.currentInstallment = isEditMode && initialExpense?.currentInstallment ?
+                initialExpense.currentInstallment : 1;
         }
 
         if (paymentMethod === 'cash') {
