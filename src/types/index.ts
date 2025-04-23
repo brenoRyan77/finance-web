@@ -160,3 +160,10 @@ export interface InitialSetup {
     userCards: UserCardVO[];
     income: Partial<Income>;
 }
+
+export interface MonthlyTrend {
+    label: string;
+    totalIncome: number;
+    totalExpense: number;
+}
+

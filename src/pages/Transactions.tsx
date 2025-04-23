@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { addMonths, subMonths, format } from 'date-fns';
 import {create, getAll} from "@/services/expenseService.ts";
+import {deleteExpense} from "@/services/api.ts";
 
 const Transactions = () => {
   const [expenses, setExpenses] = useState<ExpenseVO[]>([]);
@@ -131,10 +132,10 @@ const Transactions = () => {
     });
   };
 
-  const handleDeleteExpense = (id: string) => {
+  const handleDeleteExpense = async (id: string) => {
     const updatedExpenses = expenses.filter(expense => expense.id !== id);
     setExpenses(updatedExpenses);
-
+    await deleteExpense(id);
     toast({
       title: "Despesa excluída",
       description: "A despesa foi excluída com sucesso",

@@ -85,11 +85,13 @@ const Index = () => {
       await deleteExpense(id);
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['summary'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlyTrend'] });
 
       toast({
         title: "Despesa excluída",
         description: "A despesa foi excluída com sucesso",
       });
+      queryClient.refetchQueries({ queryKey: ['monthlyTrend'] });
     } catch (error: any) {
       toast({
         title: "Erro ao excluir despesa",
